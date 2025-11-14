@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES2020", // Versão do JS que será gerada
+    "module": "commonjs", // Sistema de módulos do Node
+    "rootDir": "./src", // Onde está seu código TS
+    "esModuleInterop": true, // Para compatibilidade de imports
+    "forceConsistentCasingInFileNames": true,
+    "strict": true, // Habilita checagens mais rigorosas
+    "skipLibCheck": true // Pula verificação de tipos em libs (mais rápido)
+  },
+  "include": ["src/**/*"] // Quais pastas ele deve "assistir"
+}

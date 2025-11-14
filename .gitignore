@@ -1,0 +1,18 @@
+# Arquivos de Senhas (MUITO IMPORTANTE)
+.env
+.env.local
+
+# Dependências
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Arquivos do TypeScript (gerados)
+dist/
+build/
+*.tsbuildinfo
+
+/generated/prisma
