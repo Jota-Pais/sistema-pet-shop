@@ -18,7 +18,7 @@ O sistema inclui o gerenciamento de clientes (donos), animais, consultas, vacina
 
 1.  **Clonar o repositório:**
     ```bash
-    git clone [https://github.com/Jota-Pais/sistema-pet-shop.git](https://github.com/Jota-Pais/sistema-pet-shop.git)
+    git clone https://github.com/Jota-Pais/sistema-pet-shop.git
     cd sistema-pet-shop
     ```
 
@@ -28,7 +28,7 @@ O sistema inclui o gerenciamento de clientes (donos), animais, consultas, vacina
     ```
 
 3.  **Configurar o Ambiente:**
-    * Renomeie o arquivo `.env.example` (que você ainda vai criar) para `.env`.
+    * Renomeie o arquivo `.env.example` para `.env`.
     * Preencha a variável `DATABASE_URL` com a string de conexão do banco.
 
 4.  **Rodar o servidor:**
