@@ -8,12 +8,60 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model funcionarios {
-  id           Int     @id(map: "order_item_pkey") @default(autoincrement())
-  razao_social String?
-  cidade       String? @db.VarChar(35)
-  estado       String? @db.Char(2)
-  cep          String? @db.VarChar(10)
-  telefone     String? @db.VarChar(20)
-  email        String? @db.VarChar(100)
+model Animal {
+  id              Int        @id @default(autoincrement())
+  nome            String     @db.VarChar(50)
+  raca            String?    @db.VarChar(100)
+  especie         String?    @db.VarChar(50)
+  peso            Decimal?   @db.Decimal(8, 2)
+  observacoes     String?    @db.VarChar(100)
+  sexo_animal     String?    @db.VarChar(1)
+  data_nascimento DateTime?  @db.Date
+  id_cliente      Int
+  Cliente         Cliente    @relation(fields: [id_cliente], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_animal_cliente")
+  Consulta        Consulta[]
+}
+
+model Cliente {
+  id            Int       @id @default(autoincrement())
+  nome          String    @db.VarChar(50)
+  cidade        String?   @db.VarChar(50)
+  cep           String?   @db.VarChar(20)
+  telefone      String?   @db.VarChar(20)
+  cpf           String?   @db.VarChar(20)
+  email         String?   @db.VarChar(100)
+  data_cadastro DateTime? @default(now()) @db.Timestamp(6)
+  Animal        Animal[]
+}
+
+model Consulta {
+  id             Int         @id @default(autoincrement())
+  data_consulta  DateTime    @db.Timestamp(6)
+  diagnostico    String?     @db.VarChar(215)
+  status         String?     @db.VarChar(100)
+  id_animal      Int
+  id_veterinario Int
+  Animal         Animal      @relation(fields: [id_animal], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_consulta_animal")
+  Veterinario    Veterinario @relation(fields: [id_veterinario], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_consulta_veterinario")
+  Servico        Servico[]
+}
+
+model Servico {
+  id          Int      @id @default(autoincrement())
+  tipo        String?  @db.VarChar(100)
+  valor       Decimal? @db.Decimal(10, 2)
+  descricao   String?  @db.VarChar(200)
+  id_consulta Int
+  Consulta    Consulta @relation(fields: [id_consulta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_servico_consulta")
+}
+
+model Veterinario {
+  id            Int        @id @default(autoincrement())
+  nome          String     @db.VarChar(50)
+  especialidade String?    @db.VarChar(67)
+  cpf           String?    @db.VarChar(20)
+  telefone      String?    @db.VarChar(20)
+  email         String?    @db.VarChar(100)
+  crmv          String?    @db.VarChar(20)
+  Consulta      Consulta[]
 }
