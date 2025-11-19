@@ -1,6 +1,5 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -8,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Animal {
+model animal {
   id              Int        @id @default(autoincrement())
   nome            String     @db.VarChar(50)
   raca            String?    @db.VarChar(100)
@@ -18,11 +17,11 @@ model Animal {
   sexo_animal     String?    @db.VarChar(1)
   data_nascimento DateTime?  @db.Date
   id_cliente      Int
-  Cliente         Cliente    @relation(fields: [id_cliente], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_animal_cliente")
-  Consulta        Consulta[]
+  cliente         cliente    @relation(fields: [id_cliente], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_animal_cliente")
+  consulta        consulta[]
 }
 
-model Cliente {
+model cliente {
   id            Int       @id @default(autoincrement())
   nome          String    @db.VarChar(50)
   cidade        String?   @db.VarChar(50)
@@ -31,31 +30,31 @@ model Cliente {
   cpf           String?   @db.VarChar(20)
   email         String?   @db.VarChar(100)
   data_cadastro DateTime? @default(now()) @db.Timestamp(6)
-  Animal        Animal[]
+  animal        animal[]
 }
 
-model Consulta {
+model consulta {
   id             Int         @id @default(autoincrement())
   data_consulta  DateTime    @db.Timestamp(6)
   diagnostico    String?     @db.VarChar(215)
   status         String?     @db.VarChar(100)
   id_animal      Int
   id_veterinario Int
-  Animal         Animal      @relation(fields: [id_animal], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_consulta_animal")
-  Veterinario    Veterinario @relation(fields: [id_veterinario], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_consulta_veterinario")
-  Servico        Servico[]
+  animal         animal      @relation(fields: [id_animal], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_consulta_animal")
+  veterinario    veterinario @relation(fields: [id_veterinario], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_consulta_veterinario")
+  servico        servico[]
 }
 
-model Servico {
+model servico {
   id          Int      @id @default(autoincrement())
   tipo        String?  @db.VarChar(100)
   valor       Decimal? @db.Decimal(10, 2)
   descricao   String?  @db.VarChar(200)
   id_consulta Int
-  Consulta    Consulta @relation(fields: [id_consulta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_servico_consulta")
+  consulta    consulta @relation(fields: [id_consulta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_servico_consulta")
 }
 
-model Veterinario {
+model veterinario {
   id            Int        @id @default(autoincrement())
   nome          String     @db.VarChar(50)
   especialidade String?    @db.VarChar(67)
@@ -63,5 +62,5 @@ model Veterinario {
   telefone      String?    @db.VarChar(20)
   email         String?    @db.VarChar(100)
   crmv          String?    @db.VarChar(20)
-  Consulta      Consulta[]
+  consulta      consulta[]
 }
