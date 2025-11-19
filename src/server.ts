@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express, { Request, Response } from 'express';
 
+import clientesRoutes from './modules/example-APIs/routes/get-clientes.router';
 
 const app = express();
 const PORT = process.env.PORT || 3333;
@@ -11,6 +12,7 @@ app.get('/', (req: Request, res: Response) => {
   res.send('API do PetShop no ar! 🚀');
 });
 
+app.use('/clientes', clientesRoutes);
 
 app.listen(PORT, () => {
    console.log('\n\n\n 🚀️ Servidor rodando na porta: ' + PORT + ' 🚀️ \n\n\n')
