@@ -4,6 +4,11 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const getClientesController = async (req: Request, res: Response) => {
-    const response = await prisma.cliente.findMany();
-    return res.status(200).json(response);
+    try {
+        const response = await prisma.cliente.findMany();
+
+        return res.status(200).json(response);
+    } catch (error) {
+        return res.status(500).json(error);
+    }
 }
