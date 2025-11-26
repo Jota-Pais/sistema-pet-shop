@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Animais - PetShop</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; background-color: #f4f6f9; }
+        h1 { color: #333; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #ffc107; color: #333; font-weight: 600; } /* Amarelo para combinar com Animais */
+        tr:hover { background-color: #f1f1f1; }
+
+        .btn { padding: 8px 15px; text-decoration: none; border-radius: 4px; font-size: 0.9rem; border: none; cursor: pointer; }
+        .btn-new { background-color: #28a745; color: white; }
+        .btn-home { background-color: #6c757d; color: white; margin-right: 10px; }
+        .btn-edit { background-color: #17a2b8; color: white; padding: 5px 10px; }
+        .btn-delete { background-color: #dc3545; color: white; padding: 5px 10px; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <h1>🐶 Animais Cadastrados</h1>
+        <div>
+            <a href="/" class="btn btn-home">🏠 Painel</a>
+            <a href="animais-novo.html" class="btn btn-new">➕ Novo Animal</a>
+        </div>
+    </div>
+
+    <table id="tabelaAnimais">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Espécie / Raça</th>
+                <th>Dono (ID Cliente)</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Preenchido via JS -->
+        </tbody>
+    </table>
+
+    <script>
+        async function carregarAnimais() {
+            try {
+                // Atenção: Sua rota no server.ts é '/animal' (singular)
+                const response = await fetch('/animal'); 
+                const animais = await response.json();
+                
+                const tbody = document.querySelector('#tabelaAnimais tbody');
+                tbody.innerHTML = '';
+
+                if(animais.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">Nenhum animal cadastrado.</td></tr>';
+                    return;
+                }
+
+                animais.forEach(animal => {
+                    const tr = document.createElement('tr');
+                    // Exibimos id_cliente. Se sua API trouxer o objeto Cliente (include), podemos mostrar o nome depois.
+                    tr.innerHTML = `
+                        <td>${animal.id}</td>
+                        <td><strong>${animal.nome}</strong></td>
+                        <td>${animal.especie} - ${animal.raca || ''}</td>
+                        <td>${animal.id_cliente}</td> 
+                        <td>
+                            <a href="/animais-editar.html?id=${animal.id}" class="btn btn-edit">Editar</a>
+                            <button class="btn btn-delete" onclick="deletarAnimal(${animal.id})">Excluir</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (erro) {
+                console.error('Erro:', erro);
+                alert('Erro ao buscar animais.');
+            }
+        }
+
+        async function deletarAnimal(id) {
+            if (confirm('Tem certeza que deseja excluir este animal?')) {
+                try {
+                    const response = await fetch(`/animal/${id}`, { method: 'DELETE' });
+                    if (response.ok) {
+                        alert('Animal removido!');
+                        carregarAnimais();
+                    } else {
+                        alert('Erro ao excluir.');
+                    }
+                } catch (erro) {
+                    console.error(erro);
+                }
+            }
+        }
+
+        carregarAnimais();
+    </script>
+</body>
+</html>

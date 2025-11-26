@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Novo Animal - PetShop</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 2rem auto; padding: 1rem; background-color: #f4f6f9; }
+        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-top: 4px solid #ffc107; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: .5rem; font-weight: bold; color: #555; }
+        input, select, textarea { width: 100%; padding: .6rem; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .btn-group { margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 10px; }
+        button { padding: .7rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-save { background: #28a745; color: white; }
+        .btn-cancel { background: #6c757d; color: white; text-decoration: none; padding: .7rem 1.5rem; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🐶 Cadastrar Novo Animal</h1>
+        
+        <form id="formAnimal">
+            <div class="form-group">
+                <label for="nome">Nome do Pet</label>
+                <input type="text" id="nome" name="nome" required placeholder="Ex: Totó">
+            </div>
+
+            <div class="form-group">
+                <label for="id_cliente">Dono (Cliente)</label>
+                <select id="id_cliente" name="id_cliente" required>
+                    <option value="">Carregando clientes...</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="display: flex; gap: 10px;">
+                <div style="flex: 1;">
+                    <label for="especie">Espécie</label>
+                    <input type="text" id="especie" name="especie" placeholder="Ex: Cachorro">
+                </div>
+                <div style="flex: 1;">
+                    <label for="raca">Raça</label>
+                    <input type="text" id="raca" name="raca">
+                </div>
+            </div>
+
+            <div class="form-group" style="display: flex; gap: 10px;">
+                <div style="flex: 1;">
+                    <label for="peso">Peso (kg)</label>
+                    <input type="number" step="0.01" id="peso" name="peso">
+                </div>
+                <div style="flex: 1;">
+                    <label for="sexo_animal">Sexo</label>
+                    <select id="sexo_animal" name="sexo_animal">
+                        <option value="M">Macho</option>
+                        <option value="F">Fêmea</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="data_nascimento">Data de Nascimento</label>
+                <input type="date" id="data_nascimento" name="data_nascimento">
+            </div>
+
+            <div class="form-group">
+                <label for="observacoes">Observações</label>
+                <textarea id="observacoes" name="observacoes" rows="3"></textarea>
+            </div>
+
+            <div class="btn-group">
+                <a href="animais-lista.html" class="btn-cancel">Cancelar</a>
+                <button type="submit" class="btn-save">Salvar</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // 1. Carregar Clientes para o Select
+        async function carregarClientes() {
+            const select = document.getElementById('id_cliente');
+            try {
+                const response = await fetch('/clientes');
+                const clientes = await response.json();
+                
+                select.innerHTML = '<option value="">Selecione um dono...</option>';
+                clientes.forEach(cliente => {
+                    // Mostra o Nome do cliente na lista, mas o valor é o ID
+                    const option = document.createElement('option');
+                    option.value = cliente.id;
+                    option.textContent = `${cliente.nome} (CPF: ${cliente.cpf || 'S/N'})`;
+                    select.appendChild(option);
+                });
+            } catch (err) {
+                select.innerHTML = '<option value="">Erro ao carregar clientes</option>';
+            }
+        }
+
+        // 2. Enviar Formulário
+        document.getElementById('formAnimal').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Tratamento dos dados para tipos corretos (Number)
+            const data = {
+                nome: document.getElementById('nome').value,
+                id_cliente: Number(document.getElementById('id_cliente').value), // Importante converter para Number
+                especie: document.getElementById('especie').value,
+                raca: document.getElementById('raca').value,
+                peso: Number(document.getElementById('peso').value),
+                sexo_animal: document.getElementById('sexo_animal').value,
+                data_nascimento: document.getElementById('data_nascimento').value ? new Date(document.getElementById('data_nascimento').value) : null,
+                observacoes: document.getElementById('observacoes').value
+            };
+
+            try {
+                const response = await fetch('/animal', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert('Animal cadastrado!');
+                    window.location.href = 'animais-lista.html';
+                } else {
+                    const err = await response.json();
+                    alert('Erro: ' + JSON.stringify(err));
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Erro de conexão.');
+            }
+        });
+
+        // Inicializa o select
+        carregarClientes();
+    </script>
+</body>
+</html>

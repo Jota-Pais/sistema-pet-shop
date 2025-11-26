@@ -42,7 +42,7 @@
 
         /* Cores Específicas por Módulo */
         .card.clientes { border-color: #28a745; } /* Verde - Ativo */
-        .card.animais { border-color: #ffc107; }  /* Amarelo */
+        .card.animais { border-color: #ffc107; }  /* Amarelo - ATIVADO AGORA */
         .card.vets { border-color: #17a2b8; }     /* Azul */
         .card.consultas { border-color: #dc3545; }/* Vermelho */
 
@@ -66,8 +66,8 @@
         .btn-outline { border: 1px solid #6c757d; color: #6c757d; }
         .btn-outline:hover { background-color: #6c757d; color: white; }
 
-        /* Botão desabilitado (para o futuro) */
-        .disabled { opacity: 0.6; cursor: not-allowed; pointer-events: none; background-color: #e9ecef; color: #adb5bd; border-color: #dee2e6; }
+        .btn-warning { background-color: #ffc107; color: #333; }
+        .btn-warning:hover { background-color: #e0a800; }
 
     </style>
 </head>
@@ -83,6 +83,7 @@
 
         <div class="dashboard-grid">
             
+            <!-- CARD CLIENTES -->
             <div class="card clientes">
                 <h2>👤 Clientes</h2>
                 <p>Gerencie os donos dos pets. Cadastro completo com endereço e contato.</p>
@@ -92,15 +93,18 @@
                 </div>
             </div>
 
+            <!-- CARD ANIMAIS (ATUALIZADO) -->
             <div class="card animais">
                 <h2>🐶 Animais</h2>
                 <p>Cadastro de pacientes (Pets) vinculados aos seus donos.</p>
                 <div class="actions">
-                    <a href="#" onclick="alert('Em breve!')" class="btn btn-outline">Listar</a>
-                    <a href="#" onclick="alert('Em breve!')" class="btn btn-outline">Novo</a>
+                    <!-- Links atualizados -->
+                    <a href="animais-lista.html" class="btn btn-outline">Listar</a>
+                    <a href="animais-novo.html" class="btn btn-warning">Novo</a>
                 </div>
             </div>
 
+            <!-- CARD VETERINÁRIOS (FUTURO) -->
             <div class="card vets">
                 <h2>🥼 Veterinários</h2>
                 <p>Gerencie a equipe médica, especialidades e dados do CRMV.</p>
@@ -110,6 +114,7 @@
                 </div>
             </div>
 
+            <!-- CARD CONSULTAS (FUTURO) -->
             <div class="card consultas">
                 <h2>📅 Consultas</h2>
                 <p>Agendamento e histórico de atendimentos clínicos e vacinas.</p>
