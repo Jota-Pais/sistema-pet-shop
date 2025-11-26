@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Animal - PetShop</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 2rem auto; padding: 1rem; background-color: #f4f6f9; }
+        .card { background: white; padding: 2rem; border-radius: 8px; border-top: 4px solid #17a2b8; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: .5rem; font-weight: bold; color: #555; }
+        input, select, textarea { width: 100%; padding: .6rem; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .btn-group { margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 10px; }
+        button { padding: .7rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-save { background: #17a2b8; color: white; }
+        .btn-cancel { background: #6c757d; color: white; text-decoration: none; padding: .7rem 1.5rem; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>✏️ Editar Animal</h1>
+        <form id="formAnimal">
+            <input type="hidden" id="animalId">
+
+            <div class="form-group">
+                <label for="nome">Nome do Pet</label>
+                <input type="text" id="nome" name="nome" required>
+            </div>
+
+            <div class="form-group">
+                <label for="id_cliente">Dono (Cliente)</label>
+                <select id="id_cliente" name="id_cliente" required>
+                    <option value="">Carregando...</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="especie">Espécie</label>
+                <input type="text" id="especie" name="especie">
+            </div>
+
+            <div class="form-group">
+                <label for="raca">Raça</label>
+                <input type="text" id="raca" name="raca">
+            </div>
+
+            <div class="btn-group">
+                <a href="animais-lista.html" class="btn-cancel">Cancelar</a>
+                <button type="submit" class="btn-save">Salvar Alterações</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+
+        if (!id) {
+            alert('ID não fornecido');
+            window.location.href = 'animais-lista.html';
+        }
+
+        // Função principal que carrega tudo
+        async function init() {
+            // 1. Carrega Clientes primeiro
+            const select = document.getElementById('id_cliente');
+            try {
+                const resClientes = await fetch('/clientes');
+                const clientes = await resClientes.json();
+                select.innerHTML = '<option value="">Selecione...</option>';
+                clientes.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = c.nome;
+                    select.appendChild(opt);
+                });
+            } catch (e) { console.error('Erro clientes', e); }
+
+            // 2. Carrega dados do Animal
+            try {
+                const resAnimal = await fetch('/animal'); // Pega todos (filtro simples no front pro trabalho)
+                const animais = await resAnimal.json();
+                const animal = animais.find(a => a.id == id);
+
+                if (animal) {
+                    document.getElementById('animalId').value = animal.id;
+                    document.getElementById('nome').value = animal.nome;
+                    document.getElementById('especie').value = animal.especie || '';
+                    document.getElementById('raca').value = animal.raca || '';
+                    
+                    // Seleciona o dono correto no dropdown
+                    if (animal.id_cliente) {
+                        select.value = animal.id_cliente;
+                    }
+                } else {
+                    alert('Animal não encontrado');
+                    window.location.href = 'animais-lista.html';
+                }
+            } catch (e) { console.error('Erro animal', e); }
+        }
+
+        // 3. Salvar (PUT)
+        document.getElementById('formAnimal').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                nome: document.getElementById('nome').value,
+                id_cliente: Number(document.getElementById('id_cliente').value),
+                especie: document.getElementById('especie').value,
+                raca: document.getElementById('raca').value
+            };
+
+            try {
+                const response = await fetch(`/animal/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (response.ok) {
+                    alert('Atualizado!');
+                    window.location.href = 'animais-lista.html';
+                } else {
+                    alert('Erro ao atualizar');
+                }
+            } catch (e) { console.error(e); }
+        });
+
+        init();
+    </script>
+</body>
+</html>
