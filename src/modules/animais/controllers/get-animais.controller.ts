@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export const getAnimaisController = async (req: Request, res: Response) => {
     try {
-        const response = await prisma.cliente.findMany();
+        const response = await prisma.animal.findMany();
 
         return res.status(200).json(response);
     } catch (error) {
