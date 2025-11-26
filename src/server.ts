@@ -5,7 +5,6 @@ import clientesRoutes from './modules/clientes/routes/index.route';
 import animaisRoutes from './modules/animais/routes/index.route';
 import servicoRoutes from './modules/servico/routes/index.route';
 import consultaRoutes from './modules/servico/routes/index.route';
-import clientesRoutes from './modules/clientes/routes/get-clientes.router';
 import veterinarioRoutes from './modules/veterinario/routes/get-veterinario.router';
 
 const app = express();
