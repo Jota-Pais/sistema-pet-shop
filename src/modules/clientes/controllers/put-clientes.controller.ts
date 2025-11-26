@@ -4,12 +4,16 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const putClientesController = async (req: Request, res: Response) => {
+
+    const id = Number(req.params.id);
+    const data = req.body;
+    
   try {
     const response = await prisma.cliente.update({
       where: {
-        id: Number(req.params.id),
+        id: id,
       },
-      data: req.body,
+      data: data
     });
 
     return res.status(200).json(response);

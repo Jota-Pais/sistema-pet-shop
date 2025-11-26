@@ -1,4 +1,3 @@
-// src/routes/clientes.routes.ts
 import { Router } from "express";
 import { postClientesController } from "../controllers/post-clientes.controller";
 

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Lista de Clientes - PetShop</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      .btn-delete {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+      }
+      .btn-new {
+        background-color: #28a745;
+        color: white;
+        text-decoration: none;
+        padding: 10px 15px;
+        display: inline-block;
+        margin-bottom: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>📋 Clientes Cadastrados</h1>
+    <a href="clientes-novo.html" class="btn-new">➕ Novo Cliente</a>
+
+    <table id="tabelaClientes">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>E-mail</th>
+          <th>Telefone</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <script>
+      async function carregarClientes() {
+        try {
+          const response = await fetch("/clientes"); // Chama seu GET /clientes
+          const clientes = await response.json();
+
+          const tbody = document.querySelector("#tabelaClientes tbody");
+          tbody.innerHTML = ""; // Limpa a tabela
+
+          clientes.forEach((cliente) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+             <td>${cliente.id}</td>
+             <td>${cliente.nome}</td>
+             <td>${cliente.email}</td>
+             <td>${cliente.telefone}</td>
+             <td>
+                 <a href="/clientes-editar.html?id=${cliente.id}" style="background-color: #ffc107; color: black; padding: 5px 10px; text-decoration: none; border: 1px solid #ffc107; cursor: pointer;">Editar</a>
+        
+                 <button class="btn-delete" onclick="deletarCliente(${cliente.id})">Excluir</button>
+             </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        } catch (erro) {
+          console.error("Erro ao listar:", erro);
+          alert("Erro ao buscar clientes.");
+        }
+      }
+
+      async function deletarCliente(id) {
+        if (confirm("Tem certeza que deseja excluir este cliente?")) {
+          try {
+            const response = await fetch(`/clientes/${id}`, {
+              method: "DELETE",
+            });
+            if (response.ok) {
+              alert("Cliente removido!");
+              carregarClientes(); // Recarrega a lista
+            } else {
+              alert(
+                "Erro ao excluir. Verifique se ele tem animais vinculados."
+              );
+            }
+          } catch (erro) {
+            console.error("Erro:", erro);
+          }
+        }
+      }
+
+      // Carrega a lista assim que a página abre
+      carregarClientes();
+    </script>
+  </body>
+</html>
