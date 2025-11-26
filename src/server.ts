@@ -1,6 +1,10 @@
 import 'dotenv/config';
 import express, { Request, Response } from 'express';
 
+import clientesRoutes from './modules/clientes/routes/index.route';
+import animaisRoutes from './modules/animais/routes/index.route';
+import servicoRoutes from './modules/servico/routes/index.route';
+import consultaRoutes from './modules/servico/routes/index.route';
 import clientesRoutes from './modules/clientes/routes/get-clientes.router';
 import veterinarioRoutes from './modules/veterinario/routes/get-veterinario.router';
 
@@ -16,6 +20,9 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.use('/clientes', clientesRoutes);
+app.use('/animal', animaisRoutes);
+app.use('/servico', servicoRoutes);
+app.use('/consulta', consultaRoutes)
 app.use('/veterinarios', veterinarioRoutes)
 
 app.listen(PORT, () => {
