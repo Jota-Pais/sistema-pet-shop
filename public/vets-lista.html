@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Veterinários - PetShop</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; background-color: #f4f6f9; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #17a2b8; color: white; font-weight: 600; } /* Azul Veterinário */
+        tr:hover { background-color: #f1f1f1; }
+
+        .btn { padding: 8px 15px; text-decoration: none; border-radius: 4px; font-size: 0.9rem; border: none; cursor: pointer; }
+        .btn-new { background-color: #28a745; color: white; }
+        .btn-home { background-color: #6c757d; color: white; margin-right: 10px; }
+        .btn-edit { background-color: #ffc107; color: #333; padding: 5px 10px; }
+        .btn-delete { background-color: #dc3545; color: white; padding: 5px 10px; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <h1>🥼 Equipe Veterinária</h1>
+        <div>
+            <a href="/" class="btn btn-home">🏠 Painel</a>
+            <a href="vets-novo.html" class="btn btn-new">➕ Novo Vet</a>
+        </div>
+    </div>
+
+    <table id="tabelaVets">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>CRMV</th>
+                <th>Especialidade</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Preenchido via JS -->
+        </tbody>
+    </table>
+
+    <script>
+        async function carregarVets() {
+            try {
+                const response = await fetch('/veterinarios');
+                const vets = await response.json();
+                
+                const tbody = document.querySelector('#tabelaVets tbody');
+                tbody.innerHTML = '';
+
+                if(vets.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">Nenhum veterinário cadastrado.</td></tr>';
+                    return;
+                }
+
+                vets.forEach(vet => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${vet.id}</td>
+                        <td>${vet.nome}</td>
+                        <td>${vet.crmv || '-'}</td>
+                        <td>${vet.especialidade || 'Clínico Geral'}</td>
+                        <td>
+                            <a href="/vets-editar.html?id=${vet.id}" class="btn btn-edit">Editar</a>
+                            <button class="btn btn-delete" onclick="deletarVet(${vet.id})">Excluir</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (erro) {
+                console.error(erro);
+                alert('Erro ao buscar veterinários.');
+            }
+        }
+
+        async function deletarVet(id) {
+            if (confirm('Tem certeza? Isso pode falhar se o vet tiver consultas vinculadas.')) {
+                try {
+                    const response = await fetch(`/veterinarios/${id}`, { method: 'DELETE' });
+                    if (response.ok) {
+                        alert('Veterinário removido!');
+                        carregarVets();
+                    } else {
+                        alert('Erro ao excluir.');
+                    }
+                } catch (erro) { console.error(erro); }
+            }
+        }
+
+        carregarVets();
+    </script>
+</body>
+</html>

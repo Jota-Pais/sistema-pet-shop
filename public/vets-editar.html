@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Veterinário - PetShop</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 2rem auto; padding: 1rem; background-color: #f4f6f9; }
+        .card { background: white; padding: 2rem; border-radius: 8px; border-top: 4px solid #17a2b8; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: .5rem; font-weight: bold; color: #555; }
+        input { width: 100%; padding: .6rem; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .btn-group { margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 10px; }
+        button { padding: .7rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-save { background: #17a2b8; color: white; }
+        .btn-cancel { background: #6c757d; color: white; text-decoration: none; padding: .7rem 1.5rem; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>✏️ Editar Veterinário</h1>
+        
+        <form id="formVet">
+            <input type="hidden" id="vetId">
+            
+            <div class="form-group">
+                <label for="nome">Nome Completo</label>
+                <input type="text" id="nome" name="nome" required>
+            </div>
+
+            <div class="form-group" style="display: flex; gap: 10px;">
+                <div style="flex: 1;">
+                    <label for="crmv">CRMV</label>
+                    <input type="text" id="crmv" name="crmv">
+                </div>
+                <div style="flex: 1;">
+                    <label for="especialidade">Especialidade</label>
+                    <input type="text" id="especialidade" name="especialidade">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email">
+            </div>
+
+            <div class="form-group">
+                <label for="telefone">Telefone</label>
+                <input type="text" id="telefone" name="telefone">
+            </div>
+
+            <div class="btn-group">
+                <a href="vets-lista.html" class="btn-cancel">Cancelar</a>
+                <button type="submit" class="btn-save">Salvar Alterações</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+
+        if (!id) window.location.href = 'vets-lista.html';
+
+        async function carregarDados() {
+            try {
+                // Busca todos e filtra (simples e rápido)
+                const response = await fetch('/veterinarios');
+                const vets = await response.json();
+                const vet = vets.find(v => v.id == id);
+
+                if (vet) {
+                    document.getElementById('vetId').value = vet.id;
+                    document.getElementById('nome').value = vet.nome;
+                    document.getElementById('crmv').value = vet.crmv || '';
+                    document.getElementById('especialidade').value = vet.especialidade || '';
+                    document.getElementById('email').value = vet.email || '';
+                    document.getElementById('telefone').value = vet.telefone || '';
+                } else {
+                    alert('Vet não encontrado!');
+                    window.location.href = 'vets-lista.html';
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        document.getElementById('formVet').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                nome: document.getElementById('nome').value,
+                crmv: document.getElementById('crmv').value,
+                especialidade: document.getElementById('especialidade').value,
+                email: document.getElementById('email').value,
+                telefone: document.getElementById('telefone').value,
+            };
+
+            try {
+                const response = await fetch(`/veterinarios/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert('Atualizado!');
+                    window.location.href = 'vets-lista.html';
+                } else {
+                    alert('Erro ao atualizar.');
+                }
+            } catch (e) { console.error(e); }
+        });
+
+        carregarDados();
+    </script>
+</body>
+</html>

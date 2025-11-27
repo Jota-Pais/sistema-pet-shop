@@ -4,7 +4,7 @@ import express, { Request, Response } from 'express';
 import clientesRoutes from './modules/clientes/routes/index.route';
 import animaisRoutes from './modules/animais/routes/index.route';
 import servicoRoutes from './modules/servico/routes/index.route';
-import consultaRoutes from './modules/servico/routes/index.route';
+import consultaRoutes from './modules/consultas/routes/index.route';
 import veterinarioRoutes from './modules/veterinario/routes/get-veterinario.router';
 
 const app = express();
@@ -25,5 +25,5 @@ app.use('/consulta', consultaRoutes)
 app.use('/veterinarios', veterinarioRoutes)
 
 app.listen(PORT, () => {
-   console.log('\n\n\n 🚀️ Servidor rodando na porta: ' + PORT + ' 🚀️ \n\n\n')
+   console.log('\n\n\n 🚀️ Servidor rodando em: http://localhost:'+ PORT + ' 🚀️ \n\n\n')
 });

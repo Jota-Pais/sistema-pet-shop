@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Consultas - PetShop</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; max-width: 1000px; margin: 2rem auto; padding: 0 1rem; background-color: #f4f6f9; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #dc3545; color: white; font-weight: 600; } /* Vermelho Consultas */
+        tr:hover { background-color: #f1f1f1; }
+
+        .btn { padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 0.85rem; border: none; cursor: pointer; display: inline-block; }
+        .btn-new { background-color: #28a745; color: white; padding: 8px 15px; font-size: 0.9rem; }
+        .btn-home { background-color: #6c757d; color: white; margin-right: 10px; padding: 8px 15px; font-size: 0.9rem; }
+        
+        .btn-edit { background-color: #ffc107; color: #333; }
+        .btn-servicos { background-color: #17a2b8; color: white; } /* Botão de Serviços */
+        .btn-delete { background-color: #dc3545; color: white; }
+
+        .status-badge { padding: 3px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; }
+        .status-agendada { background-color: #fff3cd; color: #856404; }
+        .status-concluida { background-color: #d4edda; color: #155724; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <h1>📅 Agenda de Consultas</h1>
+        <div>
+            <a href="/" class="btn btn-home">🏠 Painel</a>
+            <a href="consultas-nova.html" class="btn btn-new">➕ Nova Consulta</a>
+        </div>
+    </div>
+
+    <table id="tabelaConsultas">
+        <thead>
+            <tr>
+                <th>Data/Hora</th>
+                <th>Animal (ID)</th>
+                <th>Veterinário (ID)</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Preenchido via JS -->
+        </tbody>
+    </table>
+
+    <script>
+        async function carregarConsultas() {
+            try {
+                const response = await fetch('/consulta');
+                const consultas = await response.json();
+                
+                const tbody = document.querySelector('#tabelaConsultas tbody');
+                tbody.innerHTML = '';
+
+                if(consultas.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">Nenhuma consulta agendada.</td></tr>';
+                    return;
+                }
+
+                consultas.forEach(c => {
+                    const tr = document.createElement('tr');
+                    
+                    // Formata a data para ficar bonita (PT-BR)
+                    const dataFormatada = new Date(c.data_consulta).toLocaleString('pt-BR');
+                    
+                    // Define a cor do status
+                    let classeStatus = 'status-agendada';
+                    if (c.status === 'Concluída' || c.status === 'Realizada') classeStatus = 'status-concluida';
+
+                    // Tenta mostrar o nome se o backend mandar (c.Animal.nome), senão mostra ID
+                    const nomeAnimal = c.Animal ? c.Animal.nome : `ID: ${c.id_animal}`;
+                    const nomeVet = c.Veterinario ? c.Veterinario.nome : `ID: ${c.id_veterinario}`;
+
+                    tr.innerHTML = `
+                        <td><strong>${dataFormatada}</strong></td>
+                        <td>${nomeAnimal}</td>
+                        <td>${nomeVet}</td>
+                        <td><span class="status-badge ${classeStatus}">${c.status || 'Agendada'}</span></td>
+                        <td style="display: flex; gap: 5px;">
+                            <a href="/consultas-servicos.html?id=${c.id}" class="btn btn-servicos" title="Adicionar Vacinas/Exames">💉 Serviços</a>
+                            <a href="/consultas-editar.html?id=${c.id}" class="btn btn-edit">Editar</a>
+                            <button class="btn btn-delete" onclick="deletarConsulta(${c.id})">X</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (erro) {
+                console.error(erro);
+                alert('Erro ao carregar consultas.');
+            }
+        }
+
+        async function deletarConsulta(id) {
+            if (confirm('Tem certeza? Isso apagará também os serviços dessa consulta.')) {
+                try {
+                    const response = await fetch(`/consulta/${id}`, { method: 'DELETE' });
+                    if (response.ok) {
+                        carregarConsultas();
+                    } else {
+                        alert('Erro ao excluir.');
+                    }
+                } catch (e) { console.error(e); }
+            }
+        }
+
+        carregarConsultas();
+    </script>
+</body>
+</html>

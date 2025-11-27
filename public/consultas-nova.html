@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Nova Consulta - PetShop</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 2rem auto; padding: 1rem; background-color: #f4f6f9; }
+        .card { background: white; padding: 2rem; border-radius: 8px; border-top: 4px solid #dc3545; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: .5rem; font-weight: bold; color: #555; }
+        input, select, textarea { width: 100%; padding: .6rem; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .btn-group { margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 10px; }
+        button { padding: .7rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-save { background: #28a745; color: white; }
+        .btn-cancel { background: #6c757d; color: white; text-decoration: none; padding: .7rem 1.5rem; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>📅 Agendar Consulta</h1>
+        
+        <form id="formConsulta">
+            <div class="form-group">
+                <label for="data_consulta">Data e Hora</label>
+                <input type="datetime-local" id="data_consulta" name="data_consulta" required>
+            </div>
+
+            <div class="form-group">
+                <label for="id_animal">Paciente (Animal)</label>
+                <select id="id_animal" name="id_animal" required>
+                    <option value="">Carregando...</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="id_veterinario">Veterinário Responsável</label>
+                <select id="id_veterinario" name="id_veterinario" required>
+                    <option value="">Carregando...</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="diagnostico">Motivo / Diagnóstico Inicial</label>
+                <textarea id="diagnostico" name="diagnostico" rows="2" placeholder="Ex: Vacinação anual, Dor na pata..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                    <option value="Agendada">Agendada</option>
+                    <option value="Em Andamento">Em Andamento</option>
+                    <option value="Concluída">Concluída</option>
+                    <option value="Cancelada">Cancelada</option>
+                </select>
+            </div>
+
+            <div class="btn-group">
+                <a href="consultas-lista.html" class="btn-cancel">Cancelar</a>
+                <button type="submit" class="btn-save">Agendar</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        async function carregarDados() {
+            // Carrega Animais e Vets em paralelo
+            try {
+                const [resAnimais, resVets] = await Promise.all([
+                    fetch('/animal'),
+                    fetch('/veterinarios')
+                ]);
+
+                const animais = await resAnimais.json();
+                const vets = await resVets.json();
+
+                // Preenche Select de Animais
+                const selAnimal = document.getElementById('id_animal');
+                selAnimal.innerHTML = '<option value="">Selecione o Paciente...</option>';
+                animais.forEach(a => {
+                    const opt = document.createElement('option');
+                    opt.value = a.id;
+                    opt.textContent = `${a.nome} (${a.especie})`;
+                    selAnimal.appendChild(opt);
+                });
+
+                // Preenche Select de Veterinários
+                const selVet = document.getElementById('id_veterinario');
+                selVet.innerHTML = '<option value="">Selecione o Veterinário...</option>';
+                vets.forEach(v => {
+                    const opt = document.createElement('option');
+                    opt.value = v.id;
+                    opt.textContent = `Dr(a). ${v.nome} - ${v.especialidade || ''}`;
+                    selVet.appendChild(opt);
+                });
+
+            } catch (error) {
+                console.error(error);
+                alert('Erro ao carregar listas de animais/veterinários.');
+            }
+        }
+
+        document.getElementById('formConsulta').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // O datetime-local precisa ser convertido para ISO string ou objeto Date válido para o Prisma
+            const dataIso = new Date(document.getElementById('data_consulta').value).toISOString();
+
+            const data = {
+                data_consulta: dataIso,
+                id_animal: Number(document.getElementById('id_animal').value),
+                id_veterinario: Number(document.getElementById('id_veterinario').value),
+                diagnostico: document.getElementById('diagnostico').value,
+                status: document.getElementById('status').value
+            };
+
+            try {
+                const response = await fetch('/consulta', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert('Consulta agendada!');
+                    window.location.href = 'consultas-lista.html';
+                } else {
+                    const err = await response.json();
+                    alert('Erro: ' + JSON.stringify(err));
+                }
+            } catch (error) { console.error(error); }
+        });
+
+        carregarDados();
+    </script>
+</body>
+</html>

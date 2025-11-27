@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Consulta - PetShop</title>
+    <!-- Reaproveitando estilo por simplicidade -->
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 2rem auto; padding: 1rem; background-color: #f4f6f9; }
+        .card { background: white; padding: 2rem; border-radius: 8px; border-top: 4px solid #dc3545; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: .5rem; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: .6rem; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .btn-group { margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 10px; }
+        button { padding: .7rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-save { background: #28a745; color: white; }
+        .btn-cancel { background: #6c757d; color: white; text-decoration: none; padding: .7rem 1.5rem; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>✏️ Editar Consulta</h1>
+        <form id="formConsulta">
+            <input type="hidden" id="consultaId">
+
+            <div class="form-group">
+                <label for="data_consulta">Data e Hora</label>
+                <input type="datetime-local" id="data_consulta" name="data_consulta" required>
+            </div>
+
+            <div class="form-group">
+                <label for="id_animal">Paciente</label>
+                <select id="id_animal" name="id_animal" required></select>
+            </div>
+
+            <div class="form-group">
+                <label for="id_veterinario">Veterinário</label>
+                <select id="id_veterinario" name="id_veterinario" required></select>
+            </div>
+
+            <div class="form-group">
+                <label for="diagnostico">Diagnóstico</label>
+                <textarea id="diagnostico" name="diagnostico" rows="2"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                    <option value="Agendada">Agendada</option>
+                    <option value="Em Andamento">Em Andamento</option>
+                    <option value="Concluída">Concluída</option>
+                    <option value="Cancelada">Cancelada</option>
+                </select>
+            </div>
+
+            <div class="btn-group">
+                <a href="consultas-lista.html" class="btn-cancel">Cancelar</a>
+                <button type="submit" class="btn-save">Salvar Alterações</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        if (!id) window.location.href = 'consultas-lista.html';
+
+        async function init() {
+            try {
+                // 1. Carrega listas
+                const [resAnimais, resVets] = await Promise.all([fetch('/animal'), fetch('/veterinarios')]);
+                const animais = await resAnimais.json();
+                const vets = await resVets.json();
+
+                const selAnimal = document.getElementById('id_animal');
+                animais.forEach(a => {
+                    selAnimal.innerHTML += `<option value="${a.id}">${a.nome}</option>`;
+                });
+
+                const selVet = document.getElementById('id_veterinario');
+                vets.forEach(v => {
+                    selVet.innerHTML += `<option value="${v.id}">${v.nome}</option>`;
+                });
+
+                // 2. Carrega a consulta
+                const resConsulta = await fetch('/consulta'); // Filtro no front
+                const consultas = await resConsulta.json();
+                const consulta = consultas.find(c => c.id == id);
+
+                if (consulta) {
+                    document.getElementById('consultaId').value = consulta.id;
+                    // Formata a data para o input datetime-local (yyyy-MM-ddThh:mm)
+                    const dateObj = new Date(consulta.data_consulta);
+                    // Truque para ajustar fuso horário local simples
+                    dateObj.setMinutes(dateObj.getMinutes() - dateObj.getTimezoneOffset());
+                    document.getElementById('data_consulta').value = dateObj.toISOString().slice(0,16);
+
+                    document.getElementById('id_animal').value = consulta.id_animal;
+                    document.getElementById('id_veterinario').value = consulta.id_veterinario;
+                    document.getElementById('diagnostico').value = consulta.diagnostico || '';
+                    document.getElementById('status').value = consulta.status || 'Agendada';
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        document.getElementById('formConsulta').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                data_consulta: new Date(document.getElementById('data_consulta').value).toISOString(),
+                id_animal: Number(document.getElementById('id_animal').value),
+                id_veterinario: Number(document.getElementById('id_veterinario').value),
+                diagnostico: document.getElementById('diagnostico').value,
+                status: document.getElementById('status').value
+            };
+
+            try {
+                const response = await fetch(`/consulta/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (response.ok) { alert('Atualizado!'); window.location.href = 'consultas-lista.html'; }
+            } catch (e) { console.error(e); }
+        });
+
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Serviços da Consulta - PetShop</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; max-width: 800px; margin: 2rem auto; padding: 1rem; background-color: #f4f6f9; }
+        .container { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1, h2 { color: #333; }
+        .form-inline { display: flex; gap: 10px; background: #e9ecef; padding: 15px; border-radius: 6px; margin-bottom: 20px; align-items: flex-end; }
+        .form-group { flex: 1; }
+        label { display: block; font-size: 0.9rem; font-weight: bold; margin-bottom: 5px; }
+        input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        
+        button { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-add { background: #17a2b8; color: white; height: 38px; }
+        .btn-back { background: #6c757d; color: white; text-decoration: none; padding: 8px 15px; border-radius: 4px; display: inline-block; margin-bottom: 10px; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border-bottom: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f8f9fa; }
+        .total-row { font-size: 1.2rem; font-weight: bold; text-align: right; background-color: #f1f1f1; }
+    </style>
+</head>
+<body>
+    <a href="consultas-lista.html" class="btn-back">⬅ Voltar para Consultas</a>
+    
+    <div class="container">
+        <h1>💉 Serviços / Procedimentos</h1>
+        <p>Adicione vacinas, exames ou serviços realizados nesta consulta.</p>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+        <!-- Formulário para Adicionar Novo Serviço -->
+        <form id="formServico" class="form-inline">
+            <div class="form-group" style="flex: 2;">
+                <label>Tipo / Nome do Serviço</label>
+                <input type="text" id="tipo" name="tipo" placeholder="Ex: Vacina da Raiva, Banho..." required>
+            </div>
+            <div class="form-group" style="flex: 3;">
+                <label>Descrição Detalhada</label>
+                <input type="text" id="descricao" name="descricao" placeholder="Detalhes...">
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label>Valor (R$)</label>
+                <input type="number" id="valor" name="valor" step="0.01" placeholder="0.00" required>
+            </div>
+            <button type="submit" class="btn-add">Adicionar</button>
+        </form>
+
+        <!-- Lista de Serviços Já Lançados -->
+        <table id="tabelaServicos">
+            <thead>
+                <tr>
+                    <th>Serviço</th>
+                    <th>Descrição</th>
+                    <th>Valor</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- JS -->
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4" class="total-row" id="totalValor">Total: R$ 0.00</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const idConsulta = params.get('id');
+        if (!idConsulta) window.location.href = 'consultas-lista.html';
+
+        // 1. Carregar Serviços desta Consulta
+        async function carregarServicos() {
+            try {
+                const response = await fetch('/servico'); // Assume que retorna todos
+                const todosServicos = await response.json();
+                
+                // Filtra apenas os serviços desta consulta
+                const servicos = todosServicos.filter(s => s.id_consulta == idConsulta);
+
+                const tbody = document.querySelector('#tabelaServicos tbody');
+                tbody.innerHTML = '';
+
+                let total = 0;
+
+                servicos.forEach(s => {
+                    total += Number(s.valor);
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${s.tipo}</td>
+                        <td>${s.descricao || '-'}</td>
+                        <td>R$ ${Number(s.valor).toFixed(2)}</td>
+                        <td>
+                            <button onclick="deletarServico(${s.id})" style="color:red; background:none; padding:0;">Excluir</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                document.getElementById('totalValor').textContent = 'Total: R$ ' + total.toFixed(2);
+
+            } catch (e) { console.error(e); }
+        }
+
+        // 2. Adicionar Serviço
+        document.getElementById('formServico').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const data = {
+                tipo: document.getElementById('tipo').value,
+                descricao: document.getElementById('descricao').value,
+                valor: Number(document.getElementById('valor').value),
+                id_consulta: Number(idConsulta) // Vincula à consulta atual
+            };
+
+            try {
+                const response = await fetch('/servico', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    document.getElementById('formServico').reset();
+                    carregarServicos(); // Atualiza a tabela
+                } else {
+                    alert('Erro ao adicionar serviço.');
+                }
+            } catch (e) { console.error(e); }
+        });
+
+        // 3. Deletar Serviço
+        async function deletarServico(id) {
+            if(confirm('Remover este serviço?')) {
+                await fetch(`/servico/${id}`, { method: 'DELETE' });
+                carregarServicos();
+            }
+        }
+
+        carregarServicos();
+    </script>
+</body>
+</html>
