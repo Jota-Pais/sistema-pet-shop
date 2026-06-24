@@ -1,37 +1,92 @@
-# 🚀 Projeto Final - Sistema de Pet Shop
+# 🐾 Sistema de Pet Shop
 
-Este é o projeto final da disciplina de Banco de Dados, focado na criação de um sistema de gerenciamento para um Pet Shop (Tema 10).
+Projeto final da disciplina de **Banco de Dados I** — uma API REST com interface web para gerenciar a rotina de um pet shop: clientes (donos), seus animais, os veterinários, as consultas e os serviços oferecidos.
 
-O sistema inclui o gerenciamento de clientes (donos), animais, consultas, vacinas e exames.
+**Stack:** Node.js · Express · TypeScript · Prisma (ORM) · PostgreSQL (Supabase)
+
+<!-- 📸 DEMONSTRAÇÃO — quando tiver prints da aplicação, crie a pasta docs/, salve as imagens lá e descomente:
+## 📸 Demonstração
+
+![Lista de clientes](docs/clientes.png)
+![Cadastro de animal](docs/animal-novo.png)
+-->
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## ✨ Funcionalidades
 
-* **Backend:** Node.js, Express, TypeScript
-* **Banco de Dados:** PostgreSQL (hospedado no Supabase)
-* **ORM:** Prisma
+- **CRUD completo** das 5 entidades: clientes, animais, veterinários, consultas e serviços.
+- **Interface web** (páginas em `public/`) com telas de listagem, cadastro e edição para cada entidade.
+- **API REST** organizada por módulo, com uma rota por operação (GET / POST / PUT / DELETE).
+- **Modelagem relacional** com chaves estrangeiras e tipos adequados (`Decimal`, `Date`, `VarChar`), definida via Prisma.
 
 ---
 
-## 🏃 Como Rodar (Desenvolvimento)
+## 🗂️ Modelo de dados
 
-1.  **Clonar o repositório:**
-    ```bash
-    git clone https://github.com/Jota-Pais/sistema-pet-shop.git
-    cd sistema-pet-shop
-    ```
+5 entidades relacionadas (definidas em [`prisma/schema.prisma`](prisma/schema.prisma)):
 
-2.  **Instalar as dependências:**
-    ```bash
-    npm install
-    ```
+| Entidade | Descrição |
+|---|---|
+| **cliente** | Dono do animal |
+| **animal** | Pet, vinculado a um cliente |
+| **veterinario** | Profissional que realiza as consultas |
+| **consulta** | Atendimento de um animal por um veterinário |
+| **servico** | Serviços oferecidos pelo pet shop |
 
-3.  **Configurar o Ambiente:**
-    * Renomeie o arquivo `.env.example` para `.env`.
-    * Preencha a variável `DATABASE_URL` com a string de conexão do banco.
+---
 
-4.  **Rodar o servidor:**
-    ```bash
-    npm run dev
-    ```
+## 🔌 Endpoints da API
+
+Base local: `http://localhost:3333`
+
+| Recurso | Rota base | Operações |
+|---|---|---|
+| Clientes | `/clientes` | GET · POST · PUT · DELETE |
+| Animais | `/animal` | GET · POST · PUT · DELETE |
+| Veterinários | `/veterinarios` | GET · POST · PUT · DELETE |
+| Consultas | `/consulta` | GET · POST · PUT · DELETE |
+| Serviços | `/servico` | GET · POST · PUT · DELETE |
+
+A interface web é servida na raiz (`/`).
+
+---
+
+## 🏃 Como rodar
+
+Pré-requisitos: **Node.js 18+** e um banco **PostgreSQL** (local ou hospedado, ex.: Supabase/Neon).
+
+```bash
+# 1. Clonar o repositório
+git clone https://github.com/Jota-Pais/sistema-pet-shop.git
+cd sistema-pet-shop
+
+# 2. Instalar as dependências
+npm install
+
+# 3. Configurar o ambiente
+cp .env.example .env        # depois preencha a DATABASE_URL no .env
+
+# 4. Aplicar o schema no banco (gera o Prisma Client e cria as tabelas)
+npx prisma db push
+
+# 5. Rodar em modo de desenvolvimento
+npm run dev
+```
+
+Acesse **http://localhost:3333**.
+
+---
+
+## 🛠️ Tecnologias
+
+- **Backend:** Node.js, Express, TypeScript
+- **ORM:** Prisma
+- **Banco:** PostgreSQL (hospedado no Supabase)
+- **Front:** HTML, CSS e JavaScript (páginas estáticas em `public/`)
+
+---
+
+## 📄 Licença
+
+Distribuído sob a licença MIT. Veja [`LICENSE`](LICENSE) para mais detalhes.
