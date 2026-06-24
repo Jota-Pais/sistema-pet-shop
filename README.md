@@ -4,13 +4,6 @@ Projeto final da disciplina de **Banco de Dados I** — uma API REST com interfa
 
 **Stack:** Node.js · Express · TypeScript · Prisma (ORM) · PostgreSQL (Supabase)
 
-<!-- 📸 DEMONSTRAÇÃO — quando tiver prints da aplicação, crie a pasta docs/, salve as imagens lá e descomente:
-## 📸 Demonstração
-
-![Lista de clientes](docs/clientes.png)
-![Cadastro de animal](docs/animal-novo.png)
--->
-
 ---
 
 ## ✨ Funcionalidades
