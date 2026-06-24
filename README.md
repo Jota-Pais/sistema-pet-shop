@@ -77,9 +77,3 @@ Acesse **http://localhost:3333**.
 - **ORM:** Prisma
 - **Banco:** PostgreSQL (hospedado no Supabase)
 - **Front:** HTML, CSS e JavaScript (páginas estáticas em `public/`)
-
----
-
-## 📄 Licença
-
-Distribuído sob a licença MIT. Veja [`LICENSE`](LICENSE) para mais detalhes.
