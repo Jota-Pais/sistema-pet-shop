@@ -5,7 +5,7 @@ import clientesRoutes from './modules/clientes/routes/index.route';
 import animaisRoutes from './modules/animais/routes/index.route';
 import servicoRoutes from './modules/servico/routes/index.route';
 import consultaRoutes from './modules/consultas/routes/index.route';
-import veterinarioRoutes from './modules/veterinario/routes/get-veterinario.router';
+import veterinarioRoutes from './modules/veterinario/routes/index.route';
 
 const app = express();
 const PORT = process.env.PORT || 3333;
